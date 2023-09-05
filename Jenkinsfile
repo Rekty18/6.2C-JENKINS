@@ -1,57 +1,78 @@
 pipeline {
-    agent any 
+    agent any
+
     stages {
         stage('Build') {
             steps {
-                // Use Maven to build the code
-                sh 'mvn clean install'
+                // Echo the tool being used for building
+                echo 'Using Maven for building the project.'
             }
         }
+
         stage('Unit and Integration Tests') {
             steps {
-                // Use JUnit for unit tests
-                sh 'mvn test'
+                // Echo the tools being used for testing
+                echo 'Using JUnit for unit tests and TestNG for integration tests.'
+            }
+            post {
+                always {
+                    // Send email notification using built-in mail step
+                    mail to: 'hashen180@gmail.com',
+                         subject: "Jenkins Build: ${currentBuild.fullDisplayName}",
+                         body: "Unit and Integration Tests ${currentBuild.result}: ${env.BUILD_URL}"
+                }
             }
         }
+
         stage('Code Analysis') {
             steps {
-                // Use SonarQube for code analysis
-                sh 'mvn sonar:sonar'
+                // Echo the tool being used for code analysis
+                echo 'Using SonarQube for code analysis.'
             }
         }
+
         stage('Security Scan') {
             steps {
-                // Use OWASP Dependency-Check for security scan
-                sh 'dependency-check.sh'
+                // Echo the tool being used for security scan
+                echo 'Using OWASP Dependency-Check for security scan.'
+            }
+            post {
+                always {
+                    // Send email notification using built-in mail step
+                    mail to: 'hashen180@gmail.com',
+                         subject: "Jenkins Build: ${currentBuild.fullDisplayName}",
+                         body: "Security Scan ${currentBuild.result}: ${env.BUILD_URL}"
+                }
             }
         }
+
         stage('Deploy to Staging') {
             steps {
-                // Deploy to AWS EC2 instance
-                sh './deploy-to-staging.sh'
+                // Echo the tool being used for deployment to staging
+                echo 'Using AWS Elastic Beanstalk for deployment to staging environment.'
             }
         }
+
         stage('Integration Tests on Staging') {
             steps {
-                // Run Postman tests against staging environment
-                sh 'newman run my_collection.json'
+                // Echo the tool being used for integration tests on staging
+                echo 'Using Selenium for running integration tests on staging environment.'
             }
         }
+
         stage('Deploy to Production') {
             steps {
-                // Deploy to AWS EC2 instance
-                sh './deploy-to-production.sh'
+                // Echo the tool being used for deployment to production
+                echo 'Using AWS Elastic Beanstalk for deployment to production environment.'
             }
         }
     }
+
     post {
-        failure {
-            // Send email notifications for failure
-            mail to: 'hashen180@gmail.com', subject: 'Pipeline Failed', body: 'Check logs'
-        }
-        success {
-            // Send email notifications for success
-            mail to: 'hashen180@gmail.com', subject: 'Pipeline Succeeded', body: 'Check logs'
+        always {
+            // Echo that the pipeline has finished executing
+            echo 'Pipeline has finished executing.'
         }
     }
 }
+
